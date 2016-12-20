@@ -32,27 +32,23 @@ class MLP(chainer.Chain):
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
     parser.add_argument('--unit', '-u', type=int, default=1000, help='Number of units')
-    parser.add_argument('--number', '-n', type=int, default=1, help='mnist index')
+    parser.add_argument('--name', '-n', type=str, default="1.png", help='file name of number ')
     args = parser.parse_args()
 
-    index = min(args.number,9999)
-
-    train, test = chainer.datasets.get_mnist()
-
-    targetNumber = test[index][0].reshape(-1,784)
-    targetAnswer = test[index][1]
-    print (targetNumber)
-    print (targetAnswer)
-
     model = L.Classifier(MLP(args.unit, 10))
+
+    myNumber = Image.open('./my_numbers/' + args.name).convert("L")
+    myNumber = 1.0 - np.asarray(myNumber, dtype="float32") / 255
+    myNumber = myNumber.reshape((1, 784))
+
     chainer.serializers.load_npz('my.model', model)
 
     # Results
-    x = chainer.Variable(targetNumber)
+    x = chainer.Variable(myNumber)
     v = model.predictor(x)
-    print("mnistIndex:",args.number,"answer:", targetAnswer ,"predict:", np.argmax(v.data))
+    print("fileName:", args.name, "predict:", np.argmax(v.data))
 
-    draw_digit(targetNumber)
+    draw_digit(myNumber)
 
 
 def draw_digit(data):
