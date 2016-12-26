@@ -42,7 +42,7 @@ def main():
     targetAnswer = test[index][1]
 
     model = L.Classifier(MLP(args.unit, 10))
-    chainer.serializers.load_npz('my.model', model)
+    chainer.serializers.load_npz('linear.model', model)
 
     # Results
     x = chainer.Variable(targetNumber)

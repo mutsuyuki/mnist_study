@@ -95,7 +95,7 @@ def main():
     trainer.run()
 
     # save the tranined model
-    chainer.serializers.save_npz('my.model', model)
+    chainer.serializers.save_npz('linear.model', model)
 
 
 if __name__ == '__main__':

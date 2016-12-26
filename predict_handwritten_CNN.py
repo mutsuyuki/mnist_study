@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
-
 import argparse
 
 import chainer
 import chainer.functions as F
 import chainer.links as L
+from chainer import training
+from chainer.training import extensions
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,41 +14,40 @@ import numpy as np
 from PIL import Image
 
 # Network definition
-class MLP(chainer.Chain):
-
-    def __init__(self, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(None, n_units),  # n_in -> n_units
-            l2=L.Linear(None, n_units),  # n_units -> n_units
-            l3=L.Linear(None, n_out),  # n_units -> n_out
+class CNN(chainer.Chain):
+    def __init__(self, train=True):
+        super(CNN, self).__init__(
+            conv1=L.Convolution2D(1, 32, 5),
+            conv2=L.Convolution2D(32, 64, 5),
+            l1=L.Linear(1024, 10),
         )
+        self.train = train
 
     def __call__(self, x):
-        h1 = F.relu(self.l1(x))
-        h2 = F.relu(self.l2(h1))
-        return self.l3(h2)
-
+        h = F.max_pooling_2d(F.relu(self.conv1(x)), 2)
+        h = F.max_pooling_2d(F.relu(self.conv2(h)), 2)
+        return self.l1(h)
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
     parser.add_argument('--unit', '-u', type=int, default=1000, help='Number of units')
-    parser.add_argument('--name', '-n', type=str, default="1.png", help='file name of number ')
+    parser.add_argument('--name', '-n', type=str, default="1.png", help='file name')
     args = parser.parse_args()
 
-    model = L.Classifier(MLP(args.unit, 10))
+    model = L.Classifier(CNN())
 
-    myNumber = Image.open('./my_numbers/' + args.name).convert("L")
+    myNumber = Image.open(args.name).convert("L")
     myNumber = 1.0 - np.asarray(myNumber, dtype="float32") / 255
-    myNumber = myNumber.reshape((1, 784))
+    myNumber = myNumber.reshape((1,1,28,28))
 
-    chainer.serializers.load_npz('my.model', model)
+    chainer.serializers.load_npz('cnn.model', model)
 
     # Results
     x = chainer.Variable(myNumber)
     v = model.predictor(x)
-    print("fileName:", args.name, "predict:", np.argmax(v.data))
+    print(args.name , np.argmax(v.data))
 
+    # print (myNumber)
     draw_digit(myNumber)
 
 
