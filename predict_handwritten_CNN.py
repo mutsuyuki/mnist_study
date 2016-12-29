@@ -45,7 +45,7 @@ def main():
     # Results
     x = chainer.Variable(myNumber)
     v = model.predictor(x)
-    print(args.name , np.argmax(v.data))
+    print("fileName:", args.name, "predict:", np.argmax(v.data))
 
     # print (myNumber)
     draw_digit(myNumber)

@@ -10,8 +10,6 @@ import chainer.links as L
 import matplotlib.pyplot as plt
 import numpy as np
 
-from PIL import Image
-
 # Network definition
 class MLP(chainer.Chain):
 

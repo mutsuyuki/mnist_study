@@ -35,12 +35,11 @@ def main():
     parser.add_argument('--name', '-n', type=str, default="1.png", help='file name')
     args = parser.parse_args()
 
-    model = L.Classifier(MLP(args.unit, 10))
-
     myNumber = Image.open(args.name).convert("L")
     myNumber = 1.0 - np.asarray(myNumber, dtype="float32") / 255
     myNumber = myNumber.reshape((1, 784))
 
+    model = L.Classifier(MLP(args.unit, 10))
     chainer.serializers.load_npz('linear.model', model)
 
     # Results
